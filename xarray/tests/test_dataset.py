@@ -3317,6 +3317,27 @@ class TestDataset:
         with pytest.raises(ValueError):
             data.merge(other)
 
+    def test_merge_dataarray(self):
+        # regression test for GH3677
+        # Dataset.merge should work with DataArray objects, not just mappings
+        ds = Dataset({'a': 0})
+        da = xr.DataArray(1, name='b')
+        
+        # Compare with top-level merge function behavior
+        expected = xr.merge([ds, da])
+        actual = ds.merge(da)
+        
+        assert_identical(expected, actual)
+        
+        # Test with more complex case
+        ds = Dataset({'x': ('dim', [1, 2, 3])})
+        da = xr.DataArray([4, 5, 6], dims=['dim'], name='y')
+        
+        expected = xr.merge([ds, da])
+        actual = ds.merge(da)
+        
+        assert_identical(expected, actual)
+
     def test_setitem_original_non_unique_index(self):
         # regression test for GH943
         original = Dataset({"data": ("x", np.arange(5))}, coords={"x": [0, 1, 2, 0, 1]})
