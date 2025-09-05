@@ -809,6 +809,11 @@ def dataset_merge_method(
     # method due for backwards compatibility
     # TODO: consider deprecating it?
 
+    # Convert DataArray to Dataset to match behavior of top-level merge function
+    from .dataarray import DataArray
+    if isinstance(other, DataArray):
+        other = other.to_dataset()
+
     if isinstance(overwrite_vars, Iterable) and not isinstance(overwrite_vars, str):
         overwrite_vars = set(overwrite_vars)
     else:
